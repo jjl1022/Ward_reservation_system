@@ -1,0 +1,214 @@
+body{
+    background-color: rgba(204, 204, 204, 0.45);
+}
+.big_title{
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: "Microsoft YaHei", sans-serif;
+    color: #333;
+}
+.init_div{
+    background-color: #f2f2f2;
+    backdrop-filter: blur(50px);
+    width: 800px;
+    height: 560px;
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    text-align: center;
+}
+.reg_div{
+    display: none;
+    width: 700px;
+    height: 400px;
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    background-color: rgba(0,0,0,0);
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+label{
+    font-family: "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    color: #333;
+}
+.log_label{
+    font-size: 36px;
+}
+input{
+    background: rgba(204, 204, 204, 0.18);
+    border: 2px solid #D3D3D3;
+    font-size: 24px;
+    border-radius: 5px;
+    text-indent: 10px;
+    outline: none;
+}
+input:focus {
+    border: 2px solid #3c8ed7;
+    background: rgba(255,255,255,1);
+}
+button{
+    background-color: #3c8ed7;
+    border: none;
+    outline: none;
+    color: white;
+    border-radius: 5px;
+    transition: transform 0.1s ease;
+}
+button:hover{
+    background-color: #1e78c2;
+    cursor: pointer;
+}
+button:active{
+    transform: scale(0.9);
+    cursor: pointer;
+}
+a {
+    font-size: 20px;
+    color: #989898;
+}
+a:hover{
+    color: #0066CC;
+    text-decoration: underline;
+}
+
+
+.loading-dots {
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 50px;
+    position: absolute;
+    display: flex;
+    justify-content: flex-start;
+    background: rgba(255,255,255,0);
+}
+
+.dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px; /* 调整点之间的间距 */
+    animation: moveRight 2s infinite; /* 定义点的移动动画 */
+    animation-fill-mode: both; /* 设置动画开始和结束状态的样式 */
+}
+
+.dot:nth-child(1) {
+    background-color: rgba(0, 0, 0, 0.2); /* 初始透明度为 0.2 的颜色 */
+    animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+    background-color: rgba(0, 0, 0, 0.6); /* 初始透明度为 0.4 的颜色 */
+    animation-delay: -0.5s; /* 调整点之间的延迟时间 */
+}
+
+.dot:nth-child(3) {
+    background-color: rgba(0, 0, 0, 1); /* 初始透明度为 0.6 的颜色 */
+    animation-delay: -1s; /* 调整点之间的延迟时间 */
+}
+
+@keyframes moveRight {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0; /* 初始透明度为 0 */
+    }
+    50% {
+        transform: translateX(100%);
+        opacity: 1; /* 最终透明度为 1 */
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0; /* 结束时透明度再次为 0 */
+    }
+}
+
+.loading_block{
+    display: none;
+    position: absolute;
+    width: 400px;
+    height: 240px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(3px);
+    border-radius: 30px;
+    z-index: 99998;
+}
+
+.loading{
+    background: rgba(255,255,255,0);
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 调整颜色和透明度 */
+    z-index: 9997; /* 将覆盖层置于其他内容之上 */
+}
+.message_block{
+    display: none;
+    position: absolute;
+    width: 500px;
+    height: 250px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(3px);
+    border-radius: 30px;
+    z-index: 9999;
+    text-align: center;
+}
+.message{
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 80px;
+    position: absolute;
+    font-family: "Microsoft YaHei", sans-serif;
+    font-size: 36px;
+    color: #333;
+}
+.confirm_button{
+    top: 190px;
+    left: 180px;
+    right: 180px;
+    bottom: 15px;
+    position: absolute;
+    font-family: "Microsoft YaHei", sans-serif;
+    font-size: 24px;
+}
+
+.set_param_div{
+    width: 700px;
+    height: 400px;
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    background-color: rgba(0,0,0,0);
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.little_title{
+    font-size: 48px;
+}

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>护士管理</title>
+    <link rel="stylesheet" href="../css/table.css">
+    <style>
+        .pageTitle{
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+            font-size: 42px;
+        }
+        .ward-search{
+            position: absolute;
+            top: 100px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+        }
+        .nurseTableContainer{
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+        }
+        .add-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .edit-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 调整颜色和透明度 */
+            z-index: 9998; /* 将覆盖层置于其他内容之上 */
+        }
+        input{
+            background: rgba(204, 204, 204, 0.18);
+            border: 2px solid #D3D3D3;
+            font-size: 24px;
+            border-radius: 5px;
+            text-indent: 10px;
+            outline: none;
+        }
+        input:focus {
+            border: 2px solid #3c8ed7;
+            background: rgba(255,255,255,1);
+        }
+    </style>
+</head>
+<body>
+<div class="pageTitle">护士管理</div>
+<div id="ward-search" class="ward-search">
+    <label for="nurse_ID-input">护士号</label><input id="nurse_ID-input" style="width: 200px" type="text" />
+    <label for="department_ID-input">科室号</label><input id="department_ID-input" style="width: 200px" type="text" />
+    <label for="nurse_name-input">护士姓名</label><input id="nurse_name-input" style="width: 200px" type="text" />
+    <label for="nurse_sex-input">护士性别</label><input id="nurse_sex-input" style="width: 200px" type="text" />
+    <button onclick="showResult()">检索</button>
+    <button onclick="openAdd()">增加</button>
+</div>
+<div id="nurseTableContainer" class="nurseTableContainer"></div>
+<div class="overlay" id="mask"></div>
+<div id="add-box" class="add-box">
+    <br><br><br><label style="font-size: 36px;">增加病房</label>
+    <div>
+        <br><label for="department_ID-add-select">科室选择</label><select id="department_ID-add-select"></select><br>
+        <br><label for="nurse_name-add-input">护士姓名</label><input id="nurse_name-add-input"></input><br>
+        <br><label for="nurse_sex-add-input">护士性别</label><input id="nurse_sex-add-input"></input><br>
+        <br><label for="nurse_age-add-input">护士年龄</label><input id="nurse_age-add-input"></input><br>
+
+        <br><button onclick="addNurse()">添加</button>&emsp;<button onclick="closeAdd()">取消</button>
+    </div>
+</div>
+<div id="edit-box" class="edit-box">
+    <br><br><br><label style="font-size: 36px;">修改病房</label>
+    <div>
+        <br><label for="nurse_ID-edit-input">护士编号</label><input disabled id="nurse_ID-edit-input"></input><br>
+        <br><label for="department_ID-edit-select">科室选择</label><select id="department_ID-edit-select"></select><br>
+        <br><label for="nurse_name-edit-input">护士姓名</label><input id="nurse_name-edit-input"></input><br>
+        <br><label for="nurse_sex-edit-input">护士性别</label><input id="nurse_sex-edit-input"></input><br>
+        <br><label for="nurse_age-edit-input">护士年龄</label><input id="nurse_age-edit-input"></input><br>
+        <br><button onclick="editNurse()">保存</button>&emsp;<button onclick="closeEdit()">取消</button>
+    </div>
+</div>
+</body>
+<script>
+    function openAdd(){
+        showMask()
+        var options=[]
+        var tempList=getDepartmentData().responseMsg
+        for(var i = 0; i<tempList.length-1; ++i){
+            options.push(String(tempList[i+1][0]+"##"+tempList[i+1][1]))
+        }
+        var dropdown = document.getElementById("department_ID-add-select");
+        for (var i = 0; i < options.length; i++) {
+            var option = document.createElement("option");
+            option.value = options[i];
+            option.text = options[i];
+            dropdown.appendChild(option);
+        }
+
+        document.getElementById("add-box").style.display="block";
+    }
+    function addNurse(){
+        var dropdown = document.getElementById("department_ID-add-select");
+        var selectedOption = dropdown.options[dropdown.selectedIndex].value;
+        var department_ID=selectedOption.split("##")[0]
+        var nurse_name=document.getElementById("nurse_name-add-input").value
+        var nurse_sex=document.getElementById("nurse_sex-add-input").value
+        var nurse_age=document.getElementById("nurse_age-add-input").value
+        var newRow=department_ID+"#&"+
+            nurse_name+"#&"+
+            nurse_sex+"#&"+
+            nurse_age
+
+        var operateData={
+            new:newRow
+        }
+        syncDataToServer(NURSE_INFO_TABLE,ADD_DATA,operateData)
+        closeAdd()
+        showResult()
+    }
+    function closeAdd(){
+        closeMask()
+        document.getElementById("add-box").style.display="none";
+    }
+    function openEdit(containerID, button){
+        showMask()
+        lastRow = getRow(containerID, parseInt(getRowIndex(button)))
+        document.getElementById("nurse_ID-edit-input").value=lastRow[0]
+
+        var thisDepartment=lastRow[1]
+        var options=[]
+        var tempList=getDepartmentData().responseMsg
+        for(i = 0; i<tempList.length-1; ++i){
+            options.push(String(tempList[i+1][0]+"##"+tempList[i+1][1]))
+        }
+        var dropdown = document.getElementById("department_ID-edit-select");
+        for (i = 0; i < options.length; i++) {
+            var option = document.createElement("option");
+            option.value = options[i];
+            option.text = options[i];
+            dropdown.appendChild(option);
+            if(options[i].indexOf(thisDepartment)!==-1){
+                dropdown.selectedIndex = i;
+            }
+        }
+        document.getElementById("nurse_name-edit-input").value=lastRow[2]
+        document.getElementById("nurse_sex-edit-input").value=lastRow[3]
+        document.getElementById("nurse_age-edit-input").value=lastRow[4]
+        document.getElementById("edit-box").style.display="block"
+    }
+    function editNurse(){
+        var newRow=document.getElementById("nurse_ID-edit-input").value
+            +"#&"+document.getElementById("department_ID-edit-select").value.split("##")[0]
+            +"#&"+document.getElementById("nurse_name-edit-input").value
+            +"#&"+document.getElementById("nurse_sex-edit-input").value
+            +"#&"+document.getElementById("nurse_age-edit-input").value
+        var operateData={
+            new:newRow
+        }
+        syncDataToServer(NURSE_INFO_TABLE,EDIT_DATA,operateData)
+        closeEdit()
+        showResult()
+    }
+    function closeEdit(){
+        closeMask()
+        document.getElementById("edit-box").style.display="none";
+    }
+
+    function deleteRow(containerID,button){
+        lastRow = getRow(containerID, parseInt(getRowIndex(button)))
+        var oldRow=""
+        for(var i=0;i<lastRow.length;++i){
+            oldRow+=lastRow[i]+"#&"
+        }
+        var operateData={
+            type:DEL_NURSE,
+            old:oldRow
+        }
+        var confirmation = confirm("您确定要删除这一行吗？");
+        if (confirmation) {
+            var result=syncDataToServer(NURSE_INFO_TABLE,DEL_DATA,operateData)
+            if(result.state){
+                alert("删除成功")
+                showResult()
+            }else{
+                alert("删除失败:"+result.responseMsg)
+            }
+        }
+    }
+
+    function showResult(){
+        var div=document.getElementById("nurseTableContainer")
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+        createNurseTable("nurseTableContainer",getNurseData().responseMsg)
+    }
+    function getSearchCondition(){
+        var nurse_ID=document.getElementById("nurse_ID-input").value
+        var department_ID=document.getElementById("department_ID-input").value
+        var nurse_name=document.getElementById("nurse_name-input").value
+        var nurse_sex=document.getElementById("nurse_sex-input").value
+        return "nurse_ID LIKE '%" + nurse_ID + "%' " +
+            "AND department_ID LIKE '%" + department_ID + "%' " +
+            "AND nurse_name LIKE '%" + nurse_name + "%' "+
+            "AND nurse_sex LIKE '%" + nurse_sex + "%' "
+    }
+
+    function getDepartmentData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_DEPARTMENT_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function getNurseData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_NURSE_INFO,
+            condition:getSearchCondition()
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function createNurseTable(containerID, data) {
+        if(data.length>0){
+            data[0]=["护士号","科室号","姓名","性别","年龄"]
+        }
+
+        var container = document.getElementById(containerID);
+        var table = document.createElement("table");
+
+        // 创建表头
+        var thead = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+
+        var columnHeader = data[0].concat(["操作"]); // 创建新的表头数组
+
+        columnHeader.forEach(function (cellData) {
+            var th = document.createElement("th");
+            th.textContent = cellData;
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // 创建表格主体部分
+        var tbody = document.createElement("tbody");
+
+        for (var i = 1; i < data.length; i++) {
+            var row = document.createElement("tr");
+
+            var rowData = data[i].concat([""]); // 创建新的行数据数组
+
+            rowData.forEach(function (cellData, index) {
+                var td = document.createElement("td");
+                td.textContent = cellData;
+
+                // 如果是最后一列，添加操作按钮
+                if (index === rowData.length - 1) {
+                    var edit_button = document.createElement("button");
+                    edit_button.textContent = "编辑";
+                    edit_button.style.borderRadius = "5px 0px 0px 5px"
+                    edit_button.onclick = function (){
+                        openEdit(containerID, this)
+                    }
+                    var del_button = document.createElement("button");
+                    del_button.textContent = "删除";
+                    del_button.onclick = function () {
+                        deleteRow(containerID, this)
+                    }
+                    del_button.style.borderRadius = "0px 5px 5px 0px"
+                    var button_div = document.createElement("div");
+                    button_div.appendChild(edit_button)
+                    button_div.appendChild(del_button)
+                    td.appendChild(button_div);
+                }
+
+                row.appendChild(td);
+            });
+            tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+
+        // 将表格添加到容器中
+        container.appendChild(table);
+    }
+    function showMask() {
+        document.getElementById("mask").style.display = 'block'
+    }
+
+    function closeMask() {
+        document.getElementById("mask").style.display = 'none'
+
+    }
+
+
+
+    window.onload=showResult
+</script>
+<script src="../javascript/table.js"></script>
+<script src="../javascript/param.js"></script>
+</html>

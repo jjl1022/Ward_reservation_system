@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧病房管理系统</title>
+    <link rel="stylesheet" href="css/login.css">
+
+</head>
+<body>
+<div><!--包含整个页面-->
+    <div><!--包含全部组件-->
+        <div class="big_title">
+            <label style="font-size: 64px;font-style: oblique;">HWMIS病房管理系统</label>
+        </div>
+        <div class="log_div"><!--包含登录框-->
+            <div class="log_div_2">
+                <br><label class="log_label">管理员登录</label><br><br>
+                <input type="text" style="height: 40px" placeholder="用户名" class="username_input" id="username_input"><br><br>
+                <input type="password" style="height: 40px" placeholder="口令" class="password_input" id="password_input"><br><br>
+                <a onclick=showMessageBox("请联系工程师解决") style="cursor: pointer">忘记密码</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                <button style="font-size: 21px; width: 90px;height: 40px;" id="log_button">登录</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="overlay" id="mask"></div>
+<div class="loading_block" id="loading_block">
+    <div class="loading">
+        <br><label style="font-size: 36px;">LOADING</label>
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+</div>
+<div class="message_block" id="message_block">
+    <label class="message" id="message">message box</label><br>
+    <button class="confirm_button" onclick="closeMessageBox()">确定</button>
+</div>
+</body>
+<script src="javascript/login.js"></script>
+<script src="javascript/param.js"></script>
+</html>

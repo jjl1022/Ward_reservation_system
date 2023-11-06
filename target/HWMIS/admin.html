@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HWMIS医院病房管理系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f1f1f1;
+        }
+
+        .vertical-menu {
+            background-color: #333;
+            color: #fff;
+            padding-top: 10px;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 200px;
+        }
+
+        .menu-item {
+            padding: 12px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #555;
+            transition: background-color 0.3s;
+            color: white;
+        }
+
+        .menu-item:hover {
+            background-color: #555;
+        }
+
+        .submenu {
+            display: none;
+            padding-left: 20px;
+        }
+
+        .submenu a {
+            padding: 6px;
+            display: block;
+            text-decoration: none;
+            color: #ccc;
+            transition: background-color 0.3s;
+
+        }
+
+        .submenu a:hover {
+            background-color: #555;
+        }
+
+        .main-title{
+            text-align: center;
+            background-color: #333;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+        }
+
+        .bigTitle{
+            font-size: 42px;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+
+        .show-block{
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 80px;
+            bottom: 0;
+        }
+
+        .function-block{
+            position: absolute;
+            left: 210px;
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+        }
+
+        .page{
+            display: none;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 0, 0);
+            text-align: center;
+        }
+
+        .single-function-button:hover{
+            cursor: pointer;
+        }
+
+        #tableContainer {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .input-cell {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-cell input {
+            margin-right: 8px;
+            width: 100%;
+        }
+
+        .edit-btn,
+        .delete-btn,
+        .save-btn,
+        .add-btn {
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        .edit-btn,
+        .delete-btn {
+            background-color: #ff9999;
+            color: white;
+            border-radius: 4px;
+        }
+
+        .save-btn,
+        .add-btn {
+            background-color: #66cc99;
+            color: white;
+            border-radius: 4px;
+        }
+        button{
+            background-color: #3c8ed7;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: transform 0.1s ease;
+        }
+        button:hover{
+            background-color: #1e78c2;
+            cursor: pointer;
+        }
+        button:active{
+            transform: scale(0.9);
+            cursor: pointer;
+        }
+
+        .childPage{
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            display: none;
+        }
+        iframe{
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<script>
+
+</script>
+<div class="main-title">
+   <label class="bigTitle">HWMIS医院病房管理系统</label>
+</div>
+<div class="show-block">
+    <div class="vertical-menu">
+        <a href="#" class="menu-item" onclick="toggleSubMenu(1)">公开页面</a>
+        <div id="submenu-1" class="submenu">
+            <a href="#" data-target="selfBooking" class="single-function-button">病人自主预约</a>
+        </div>
+
+        <a href="#" class="menu-item" onclick="toggleSubMenu(2)">住院管理</a>
+        <div id="submenu-2" class="submenu">
+            <a class="single-function-button" data-target="booking">住院管理</a>
+            <a data-target="checkIn" class="single-function-button">入住报到</a>
+            <a data-target="checkOut" class="single-function-button">出院办理</a>
+        </div>
+
+        <a href="#" class="menu-item" onclick="toggleSubMenu(3)">值班管理</a>
+        <div id="submenu-3" class="submenu">
+            <a class="single-function-button" data-target="doctorWork">医生值班表</a>
+            <a class="single-function-button" data-target="nurseWork">护士值班表</a>
+        </div>
+
+        <a href="#" class="menu-item" onclick="toggleSubMenu(4)">基本数据管理</a>
+        <div id="submenu-4" class="submenu">
+            <a class="single-function-button" data-target="patient">病人</a>
+            <a class="single-function-button" data-target="department">科室</a>
+            <a class="single-function-button" data-target="ward">病房</a>
+            <a class="single-function-button" data-target="bunk">床位</a>
+            <a class="single-function-button" data-target="doctor">医生</a>
+            <a class="single-function-button" data-target="nurse">护士</a>
+<!--            <a class="single-function-button" data-target="case">病例</a>-->
+        </div>
+
+        <a href="#" class="menu-item" onclick="toggleSubMenu(5)">数据可视化</a>
+        <div id="submenu-5" class="submenu">
+<!--            <a class="single-function-button" data-target="chart">数据报表</a>-->
+            <a class="single-function-button" data-target="chart">饼状图</a>
+        </div>
+
+        <a href="#" class="menu-item" onclick="toggleSubMenu(6)">管理员</a>
+        <div id="submenu-6" class="submenu">
+            <a class="single-function-button" data-target="changePassword">修改密码</a>
+            <a style="cursor: pointer" onclick="setLogStatus(false)">退出登录</a>
+<!--            <a class="single-function-button" data-target="administrator">管理员信息</a>-->
+        </div>
+
+    </div>
+    <div class="function-block">
+        <iframe class="childPage" id="selfBooking" src="patientBookingBunk.html"></iframe>
+        <iframe class="childPage" id="homeSetting" src="childPage/homeSetting.html"></iframe>
+        <iframe class="childPage" id="booking" src="childPage/booking.html"></iframe>
+        <iframe class="childPage" id="checkIn" src="childPage/checkIn.html"></iframe>
+        <iframe class="childPage" id="checkOut" src="childPage/checkOut.html"></iframe>
+        <iframe class="childPage" id="doctorWork" src="childPage/doctorWork.html"></iframe>
+        <iframe class="childPage" id="nurseWork" src="childPage/nurseWork.html"></iframe>
+        <iframe class="childPage" id="department" src="childPage/department.html"></iframe>
+        <iframe class="childPage" id="ward" src="childPage/ward.html"></iframe>
+        <iframe class="childPage" id="bunk" src="childPage/bunk.html"></iframe>
+        <iframe class="childPage" id="doctor" src="childPage/doctor.html"></iframe>
+        <iframe class="childPage" id="nurse" src="childPage/nurse.html"></iframe>
+        <iframe class="childPage" id="patient" src="childPage/patient.html"></iframe>
+        <iframe class="childPage" id="case" src="childPage/case.html"></iframe>
+        <iframe class="childPage" id="administrator" src="childPage/administrator.html"></iframe>
+        <iframe class="childPage" id="chart" src="childPage/chart.html"></iframe>
+        <iframe class="childPage" id="changePassword" src="childPage/changePassword.html"></iframe>
+
+    </div>
+</div>
+<script src="javascript/table.js"></script>
+<script src="javascript/admin.js"></script>
+<script src="javascript/param.js"></script>
+</body>
+</html>

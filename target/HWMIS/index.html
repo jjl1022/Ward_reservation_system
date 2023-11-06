@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧病房管理系统</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/table.css">
+</head>
+<body>
+<div><!--包含整个页面-->
+    <div class="main_block">
+        <div class="big_title">
+            <label style="font-size: 64px;">HWMIS病房管理系统</label>
+        </div>
+        <div class="nav_block">
+            <nav>
+                <a onclick="showHome()">首页</a>
+                <a onclick="showPatientCenter()">病患中心</a>
+                <a onclick="showInformationDisplay()">信息公开</a>
+                <a onclick="showDataManage()">数据管理</a>
+                <a onclick="showDataQuery()">数据查询</a>
+                <a onclick="showDataStat()">数据统计</a>
+                <a onclick="adminCenter()" id="admin_show" class="admin_show">管理员登录</a>
+                <a onclick="setLogStatus(false)" id="log_out" class="log_out">注销登录</a>
+            </nav>
+        </div>
+        <div class="show_block_father">
+            <div class="show_block" id="show_block">
+                <div id="home_block" style="display: none;position: absolute;left: 0;right: 0">
+                    <h1>主页</h1>
+                </div>
+                <div id="patient_center_block" style="display: none;position: absolute;left: 0;right: 0">
+                    <h1>病患中心</h1>
+                </div>
+                <div id="message_show_block" style="display: none;position: absolute;left: 0;right: 0">
+                    <h1>信息展示</h1>
+                </div>
+                <div id="data_manage_block" style="display: none;position: absolute;left: 0;right: 0;top: 0;bottom: 0;">
+                    <div class="tab">
+                        <button class="tablinks" onclick="openTab(event, '病患');searchPatient('patientTableContainer')">病患</button>
+                        <button class="tablinks" onclick="openTab(event, '科室');searchDepartment('departmentTableContainer')">科室</button>
+                        <button class="tablinks" onclick="openTab(event, '病房');searchWard('wardTableContainer')">病房</button>
+                        <button class="tablinks" onclick="openTab(event, '床位');searchBed('bedTableContainer')">床位</button>
+                        <button class="tablinks" onclick="openTab(event, '医生');searchDoctor('doctorContainer')">医生</button>
+                        <button class="tablinks" onclick="openTab(event, '护士');searchNurse('nurseTableContainer')">护士</button>
+                        <button class="tablinks" onclick="openTab(event, '医生值班');searchDoctorDuty('doctorWorkTableContainer')">医生值班</button>
+                        <button class="tablinks" onclick="openTab(event, '护士值班');searchNurseDuty('nurseWorkTableContainer')">护士值班</button>
+                        <button class="tablinks" onclick="openTab(event, '床位预定');searchBooking('bookingTableContainer')">床位预定</button>
+                        <button class="tablinks" onclick="openTab(event, '病例');searchCase('caseTableContainer')">病例</button>
+                        <button class="tablinks" onclick="openTab(event, '入住情况');searchCheckIn('checkInTableContainer')">入住情况</button>
+                        <button class="tablinks" onclick="openTab(event, '管理员');searchAdmin('adminTableContainer')">管理员</button>
+                    </div>
+                    <div id="病患" class="tabcontent">
+                        <input type="text" id="patientSearchIdInput" style="height: 30px" placeholder="检索病患号">
+                        <input type="text" id="patientSearchNameInput" style="height: 30px" placeholder="检索病人名">
+                        <button onclick=searchPatient("patientTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("patientTableContainer") style="width: 120px;height: 30px">录入病人信息</button>
+                        <div id="patientTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="科室" class="tabcontent" >
+                        <input type="text" id="departmentSearchNumberInput" style="height: 30px" placeholder="检索科室号">
+                        <input type="text" id="departmentSearchIdInput" style="height: 30px" placeholder="检索科室名">
+                        <button onclick=searchDepartment("departmentTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("departmentTableContainer") style="width: 120px;height: 30px">录入科室信息</button>
+                        <div id="departmentTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="病房" class="tabcontent" >
+                        <input type="text" id="wardSearchNumberInput" style="height: 30px" placeholder="检索病房号">
+                        <input type="text" id="wardSearchDepartmentInput" style="height: 30px" placeholder="检索所属科室">
+                        <button onclick=searchWard("wardTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("wardTableContainer") style="width: 120px;height: 30px">录入病房信息</button>
+                        <div id="wardTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="床位" class="tabcontent">
+                        <input type="text" id="bedSearchBunkNumberInput" style="height: 30px" placeholder="检索床位号">
+                        <input type="text" id="bedSearchWardNumberInput" style="height: 30px" placeholder="检索所属病房">
+                        <input type="text" id="bedSearchIsCheckIn" style="height: 30px" placeholder="检索是否入住">
+                        <button onclick=searchBed("bedTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("bedTableContainer") style="width: 120px;height: 30px">录入床位信息</button>
+                        <div id="bedTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="医生" class="tabcontent">
+                        <input type="text" id="doctorSearchIdInput" style="height: 30px" placeholder="检索医生编号">
+                        <input type="text" id="doctorSearchDepartmentInput" style="height: 30px" placeholder="检索所属科室">
+                        <input type="text" id="doctorSearchNameInput" style="height: 30px" placeholder="检索姓名">
+                        <button onclick=searchDoctor("doctorContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("doctorContainer") style="width: 120px;height: 30px">录入医生信息</button>
+                        <div id="doctorContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="护士" class="tabcontent">
+                        <input type="text" id="nurseSearchIdInput" style="height: 30px" placeholder="检索护士编号">
+                        <input type="text" id="nurseSearchDepartmentInput" style="height: 30px" placeholder="检索所属科室">
+                        <input type="text" id="nurseSearchNameInput" style="height: 30px" placeholder="检索姓名">
+                        <button onclick=searchNurse("nurseTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("nurseTableContainer") style="width: 120px;height: 30px">录入护士信息</button>
+                        <div id="nurseTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="医生值班" class="tabcontent">
+                        <input type="text" id="doctorWorkSearchDutyIdInput" style="height: 30px" placeholder="检索值班编号">
+                        <input type="text" id="doctorWorkSearchDoctorIdInput" style="height: 30px" placeholder="检索医生编号">
+                        <input type="text" id="doctorWorkSearchTimeInput" style="height: 30px" placeholder="检索姓名">
+                        <button onclick=searchDoctorDuty("doctorWorkTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("doctorWorkTableContainer") style="width: 120px;height: 30px">录入护士信息</button>
+                        <div id="doctorWorkTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="护士值班" class="tabcontent">
+                        <input type="text" id="nurseWorkSearchDutyIdInput" style="height: 30px" placeholder="检索值班编号">
+                        <input type="text" id="nurseWorkSearchDoctorIdInput" style="height: 30px" placeholder="检索护士编号">
+                        <input type="text" id="nurseWorkSearchTimeInput" style="height: 30px" placeholder="检索姓名">
+                        <button onclick=searchNurseDuty("nurseWorkTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("nurseWorkTableContainer") style="width: 120px;height: 30px">录入护士信息</button>
+                        <div id="nurseWorkTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="床位预定" class="tabcontent">
+                        <input type="text" id="bookingSearchBookingNumberInput" style="height: 30px" placeholder="检索预定编号">
+                        <input type="text" id="bookingSearchPatientIdInput" style="height: 30px" placeholder="检索病人编号">
+                        <input type="text" id="bookingSearchBunkNumberInput" style="height: 30px" placeholder="检索姓名">
+                        <button onclick=searchBooking("bookingTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("bookingTableContainer") style="width: 120px;height: 30px">录入护士信息</button>
+                        <div id="bookingTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="病例" class="tabcontent">
+                        <input type="text" id="caseSearchHospitalNumberInput" style="height: 30px" placeholder="检索病历号">
+                        <input type="text" id="caseSearchPatientIdInput" style="height: 30px" placeholder="检索病人ID">
+                        <input type="text" id="caseSearchDoctorIdInput" style="height: 30px" placeholder="检索医生ID">
+                        <button onclick=searchCase("caseTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("caseTableContainer") style="width: 120px;height: 30px">录入病例信息</button>
+                        <div id="caseTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="入住情况" class="tabcontent">
+                        <input type="text" id="checkInSearchCheckInNumberInput" style="height: 30px" placeholder="检索入住登记号">
+                        <input type="text" id="checkInSearchHospitalNumberInput" style="height: 30px" placeholder="检索病人ID">
+                        <input type="text" id="checkInSearchBunkNumberInput" style="height: 30px" placeholder="检索床位号">
+                        <button onclick=searchCheckIn("checkInTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("checkInTableContainer") style="width: 120px;height: 30px">录入入住信息</button>
+                        <div id="checkInTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+
+                    <div id="管理员" class="tabcontent">
+                        <input type="text" id="adminSearchUsernameInput" style="height: 30px" placeholder="检索用户名">
+                        <button onclick=searchAdmin("adminTableContainer") style="width: 50px;height: 30px">搜索</button>
+                        <button onclick=addRow("adminTableContainer") style="width: 120px;height: 30px">增加管理员</button>
+                        <div id="adminTableContainer" style="left: 10px;right: 10px;bottom: 0;top: 70px;position: absolute"></div>
+                    </div>
+                </div>
+                <div id="data_query_block" style="display: none;position: absolute;left: 0;right: 0">
+                    <h1>数据查询</h1>
+                </div>
+                <div id="data_stat_block" style="display: none;position: absolute;left: 0;right: 0">
+                    <h1>数据统计</h1>
+                </div>
+                <div id="admin_center_block" style="display: none;position: absolute;left: 0;right: 0">
+                    <h1>管理员中心</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="overlay" id="mask"></div>
+<div class="loading_block" id="loading_block">
+    <div class="loading">
+        <br><label style="font-size: 36px;">LOADING</label>
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+</div>
+<div class="message_block" id="message_block">
+    <label class="message" id="message">message box</label><br>
+    <button class="confirm_button" onclick="closeMessageBox()">确定</button>
+</div>
+</body>
+<script src="javascript/index.js"></script>
+<script src="javascript/table.js"></script>
+<script src="javascript/param.js"></script>
+</html>

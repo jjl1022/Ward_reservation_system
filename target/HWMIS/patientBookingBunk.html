@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>预定病房</title>
+    <link rel="stylesheet" href="css/table.css">
+    <style>
+        .pageTitle{
+            position: absolute;
+            top: 120px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+            font-size: 64px;
+        }
+        .bunk-search{
+            position: absolute;
+            top: 100px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+        }
+        .bookingTableContainer{
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+        }
+        .post-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9998;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .booking-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9998;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .cancel-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9998;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .search-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9998;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 调整颜色和透明度 */
+            z-index: 9998; /* 将覆盖层置于其他内容之上 */
+        }
+        input{
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid #D3D3D3;
+            font-size: 24px;
+            border-radius: 5px;
+            text-indent: 10px;
+            outline: none;
+        }
+        input:focus {
+            border: 2px solid #3c8ed7;
+            background: rgba(255,255,255,1);
+        }
+        .message_block{
+            display: none;
+            position: absolute;
+            width: 500px;
+            height: 250px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(3px);
+            border-radius: 30px;
+            z-index: 9999;
+            text-align: center;
+        }
+        .message{
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 80px;
+            position: absolute;
+            font-family: "Microsoft YaHei", sans-serif;
+            font-size: 36px;
+            color: #333;
+        }
+        .confirm_button{
+            top: 190px;
+            left: 180px;
+            right: 180px;
+            bottom: 15px;
+            position: absolute;
+            font-family: "Microsoft YaHei", sans-serif;
+            font-size: 24px;
+        }
+        .main_block{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+    </style>
+</head>
+<body>
+<div class="pageTitle">患者预约中心</div>
+<div class="overlay" id="mask"></div>
+<div class="message_block" id="message_block">
+    <label class="message" id="message">message box</label><br>
+    <button class="confirm_button" onclick="closeMessageBox()">确定</button>
+</div>
+<div id="main-block" class="main_block">
+    <button onclick="openPost()" style="width: 300px;height: 140px;font-size: 42px;border-radius: 30px">提交信息</button>&emsp;&emsp;
+    <button onclick="openBooking()" style="width: 300px;height: 150px;font-size: 42px;border-radius: 30px">预定床位</button><br><br><br>
+    <button onclick="openCancel()" style="width: 300px;height: 140px;font-size: 42px;border-radius: 30px">取消预约</button>&emsp;&emsp;
+    <button onclick="openSearch()" style="width: 300px;height: 150px;font-size: 42px;border-radius: 30px">预定查询</button>
+
+</div>
+<div id="post-box" class="post-box">
+    <br><br><br><label style="font-size: 36px;">提交病人信息</label>
+    <div>
+        <br><label for="patient_name-post-input">病人姓名</label><input id="patient_name-post-input" style="width: 200px;" type="text"><br>
+        <br><label for="patient_sex-post-input">病人性别</label><input id="patient_sex-post-input" style="width: 200px;" type="text"><br>
+        <br><label for="patient_age-post-input">病人年龄</label><input id="patient_age-post-input" style="width: 200px;" type="text"><br>
+        <br><button onclick="post()">提交</button>&emsp;<button onclick="closePost()">取消</button>
+    </div>
+</div>
+<div id="booking-box" class="booking-box">
+    <br><br><br><label style="font-size: 36px;">选择床位预定</label>
+    <div>
+        <br><label for="patient_ID-booking-input">病人号</label><input id="patient_ID-booking-input" type="text" /><br>
+        <br><label for="bunk_number-booking-select">床位号</label><select id="bunk_number-booking-select" type="text"></select><br>
+        <br><button onclick="booking()">预定</button>&emsp;<button onclick="closeBooking()">取消</button>
+    </div>
+</div>
+<div id="cancel-box" class="cancel-box">
+    <br><br><br><label style="font-size: 36px;">取消床位预定</label>
+    <div>
+        <br><label for="booking_number-cancel-input">预定号</label><input id="booking_number-cancel-input" type="text" /><br>
+        <br><label for="patient_name-cancel-input">病人号</label><input id="patient_name-cancel-input" type="text"/><br>
+        <br><button onclick="cancel()">撤销预约</button>&emsp;<button onclick="closeCancel()">取消</button>
+    </div>
+</div>
+<div id="search-box" class="search-box">
+    <br><br><br><label style="font-size: 36px;">查询床位预定</label>
+    <div>
+        <br><label for="booking_number-search-input">预定号</label><input  id="booking_number-search-input" type="text" /><br>
+        <br><button onclick="search()">查询</button>&emsp;<button onclick="closeSearch()">取消</button>
+    </div>
+</div>
+</body>
+<script>
+    function openPost(){
+        showMask()
+        document.getElementById("patient_name-post-input").value=""
+        document.getElementById("patient_sex-post-input").value=""
+        document.getElementById("patient_age-post-input").value=""
+        document.getElementById("post-box").style.display="block";
+    }
+    function post(){
+        var newRow=document.getElementById("patient_name-post-input").value
+            +"#&"+document.getElementById("patient_sex-post-input").value
+            +"#&"+document.getElementById("patient_age-post-input").value
+        var operateData={
+            new:newRow
+        }
+        var result=syncDataToServer(PATIENT_INFO_TABLE,ADD_DATA,operateData)
+        if(result.state){
+            showMessageBox("提交成功:\n"+result.responseMsg)
+            closePost()
+        }else{
+            showMessageBox("提交失败"+result.responseMsg)
+        }
+    }
+    function closePost(){
+        document.getElementById("post-box").style.display="none";
+        closeMask()
+    }
+    function openBooking(){
+        showMask()
+        var bunkOption=getFreeBunk()
+        document.getElementById("patient_ID-booking-input").value=""
+        clearSelectElement("bunk_number-booking-select")
+        var bunk_number_select = document.getElementById("bunk_number-booking-select");
+        for (var i = 0; i < bunkOption.length; i++) {
+            var option = document.createElement("option");
+            option.value = bunkOption[i];
+            option.text = bunkOption[i];
+            bunk_number_select.appendChild(option);
+        }
+        document.getElementById("booking-box").style.display="block";
+    }
+    function booking(){
+        var info=document.getElementById("patient_ID-booking-input").value
+            +"#&"+document.getElementById("bunk_number-booking-select").value
+        var operateData={
+            'info':info,
+            type:SELF_BOOKING
+        }
+
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+
+        var state
+        var responseMsg
+
+        console.log(JSON.stringify(operateData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    state=(response["state"] === "succ");
+                    responseMsg=response["detail"]
+                    if(state){
+                        showMessageBox("预定成功:\n"+responseMsg)
+                        closeBooking()
+                    } else{
+                        showMessageBox("预定失败:\n"+responseMsg)
+                    }
+                } else {
+                    showMessageBox("网络连接失败")
+                }
+            }
+        };
+        xhr.send(JSON.stringify(operateData));
+    }
+    function closeBooking(){
+        document.getElementById("booking-box").style.display="none";
+        closeMask()
+    }
+    function openCancel(){
+        showMask()
+        document.getElementById("booking_number-cancel-input").value=""
+        document.getElementById("patient_name-cancel-input").value=""
+        document.getElementById("cancel-box").style.display="block";
+    }
+    function cancel(){
+        var info=document.getElementById("booking_number-cancel-input").value
+            +"#&"+document.getElementById("patient_name-cancel-input").value
+        var operateData={
+            'info':info,
+            type:SELF_CANCEL_BOOKING
+        }
+
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+
+        var state
+        var responseMsg
+
+        console.log(JSON.stringify(operateData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    state=(response["state"] === "succ");
+                    responseMsg=response["detail"]
+                    if(state){
+                        showMessageBox("撤销预定成功")
+                        closeCancel()
+                    } else{
+                        showMessageBox("撤销预定失败:\n"+responseMsg)
+                    }
+                } else {
+                    showMessageBox("网络连接失败")
+                }
+            }
+        };
+        xhr.send(JSON.stringify(operateData));
+    }
+    function closeCancel(){
+        document.getElementById("cancel-box").style.display="none";
+        closeMask()
+    }
+    function openSearch(){
+        showMask()
+        document.getElementById("booking_number-search-input").value=""
+        document.getElementById("search-box").style.display="block";
+    }
+    function search(){
+        var info=document.getElementById("booking_number-search-input").value
+        var operateData={
+            'info':info,
+            type:SELF_SEARCH_BOOKING
+        }
+
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+
+        var state
+        var responseMsg
+
+        console.log(JSON.stringify(operateData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    state=(response["state"] === "succ");
+                    responseMsg=response["detail"]
+                    if(state){
+                        showMessageBox("查询预定成功:\n"+responseMsg)
+                    } else{
+                        showMessageBox("查询预定失败:\n"+responseMsg)
+                    }
+                } else {
+                    showMessageBox("网络连接失败")
+                }
+            }
+        };
+        xhr.send(JSON.stringify(operateData));
+    }
+    function closeSearch(){
+        document.getElementById("search-box").style.display="none";
+        closeMask()
+    }
+
+    function getFreeBunk(){
+        var tempList=getBunkData().responseMsg
+        var resultList=[]
+        for(var i=1;i<tempList.length;++i){
+            if(tempList[i][2]==="否"){
+                resultList.push(tempList[i][0])
+            }
+        }
+        return resultList
+    }
+
+    function getBunkData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_BED_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function showMessageBox(msg) {
+        showMask()
+        document.getElementById("message").innerText=msg
+        document.getElementById("message_block").style.display = "block"
+    }
+
+    function closeMessageBox() {
+        closeMask()
+        document.getElementById("message").innerText=""
+        document.getElementById("message_block").style.display = "none"
+    }
+
+    function showMask() {
+        document.getElementById("mask").style.display = 'block'
+    }
+
+    function closeMask() {
+        document.getElementById("mask").style.display = 'none'
+
+    }
+
+</script>
+<script src="javascript/table.js"></script>
+<script src="javascript/param.js"></script>
+</html>

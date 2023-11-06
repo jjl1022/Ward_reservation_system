@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>科室管理</title>
+    <link rel="stylesheet" href="../css/table.css">
+    <style>
+        .pageTitle{
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+            font-size: 42px;
+        }
+        .department-search{
+            position: absolute;
+            top: 100px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+        }
+        .departmentTableContainer{
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+        }
+        .add-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .edit-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 调整颜色和透明度 */
+            z-index: 9998; /* 将覆盖层置于其他内容之上 */
+        }
+        input{
+            background: rgba(204, 204, 204, 0.18);
+            border: 2px solid #D3D3D3;
+            font-size: 24px;
+            border-radius: 5px;
+            text-indent: 10px;
+            outline: none;
+        }
+        input:focus {
+            border: 2px solid #3c8ed7;
+            background: rgba(255,255,255,1);
+        }
+    </style>
+</head>
+<body>
+<div class="pageTitle">科室管理</div>
+<div id="department-search" class="department-search">
+    <label for="departmentID-input">科室号</label><input id="departmentID-input" type="text" />
+    <label for="departmentName-input">科室名</label><input id="departmentName-input" type="text" />
+    <button onclick="showResult()">检索</button>
+    <button onclick="openAdd()">增加</button>
+</div>
+<div id="departmentTableContainer" class="departmentTableContainer"></div>
+<div class="overlay" id="mask"></div>
+<div id="add-box" class="add-box">
+    <br><br><br><label style="font-size: 36px;">增加科室</label>
+    <div>
+        <br><label for="departmentName-add-input">科室名</label><input id="departmentName-add-input" style="width: 200px;" type="text"><br>
+        <br><label for="departmentAddress-add-input">地&emsp;址</label><input id="departmentAddress-add-input" style="width: 200px;" type="text"><br>
+        <br><label for="departmentPhone-add-input">电&emsp;话</label><input id="departmentPhone-add-input" style="width: 200px;" type="text"><br>
+        <br><button onclick="addDepartment()">添加</button>&emsp;<button onclick="closeAdd()">取消</button>
+    </div>
+</div>
+<div id="edit-box" class="edit-box">
+    <br><br><br><label style="font-size: 36px;">修改科室</label>
+    <div>
+        <br><label for="departmentID-edit-input">科室号</label><input disabled id="departmentID-edit-input" style="width: 200px;" type="text"><br>
+        <br><label for="departmentName-edit-input">科室名</label><input id="departmentName-edit-input" style="width: 200px;" type="text"><br>
+        <br><label for="departmentAddress-edit-input">地&emsp;址</label><input id="departmentAddress-edit-input" style="width: 200px;" type="text"><br>
+        <br><label for="departmentPhone-edit-input">电&emsp;话</label><input id="departmentPhone-edit-input" style="width: 200px;" type="text"><br>
+        <br><button onclick="editDepartment()">保存</button>&emsp;<button onclick="closeEdit()">取消</button>
+    </div>
+</div>
+</body>
+<script>
+    function openAdd(){
+        showMask()
+        document.getElementById("add-box").style.display="block";
+    }
+    function addDepartment(){
+        var newRow=document.getElementById("departmentName-add-input").value+"#&"+document.getElementById("departmentAddress-add-input").value+"#&"+document.getElementById("departmentPhone-add-input").value
+        var operateData={
+            new:newRow
+        }
+        syncDataToServer(DEPARTMENT_INFO_TABLE,ADD_DATA,operateData)
+        closeAdd()
+        showResult()
+    }
+    function closeAdd(){
+        closeMask()
+        document.getElementById("add-box").style.display="none";
+    }
+    function openEdit(containerID, button){
+        showMask()
+        lastRow = getRow(containerID, parseInt(getRowIndex(button)))
+        document.getElementById("departmentID-edit-input").value=lastRow[0]
+        document.getElementById("departmentName-edit-input").value=lastRow[1]
+        document.getElementById("departmentAddress-edit-input").value=lastRow[2]
+        document.getElementById("departmentPhone-edit-input").value=lastRow[3]
+        document.getElementById("edit-box").style.display="block";
+    }
+    function editDepartment(){
+        var newRow=document.getElementById("departmentID-edit-input").value+"#&"+document.getElementById("departmentName-edit-input").value+"#&"+document.getElementById("departmentAddress-edit-input").value+"#&"+document.getElementById("departmentPhone-edit-input").value
+        var operateData={
+            new:newRow
+        }
+        syncDataToServer(DEPARTMENT_INFO_TABLE,EDIT_DATA,operateData)
+        closeEdit()
+        showResult()
+    }
+    function closeEdit(){
+        closeMask()
+        document.getElementById("edit-box").style.display="none";
+    }
+
+    function deleteRow(containerID,button){
+        lastRow = getRow(containerID, parseInt(getRowIndex(button)))
+        var oldRow=""
+        for(var i=0;i<lastRow.length;++i){
+            oldRow+=lastRow[i]+"#&"
+        }
+        var operateData={
+            type:DEL_DEPARTMENT,
+            old:oldRow
+        }
+        var confirmation = confirm("您确定要删除这一行吗？");
+        if (confirmation) {
+            var result=syncDataToServer(DEPARTMENT_INFO_TABLE,DEL_DATA,operateData)
+            if(result.state){
+                alert("删除成功")
+                showResult()
+            }else{
+                alert("删除失败:"+result.responseMsg)
+            }
+        }
+    }
+
+    function showResult(){
+        var div=document.getElementById("departmentTableContainer")
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+        createDepartmentTable("departmentTableContainer",getDepartmentData().responseMsg)
+    }
+    function getSearchCondition(){
+        var id=document.getElementById("departmentID-input").value
+        var name=document.getElementById("departmentName-input").value
+        return "department_ID LIKE '%" + id + "%' AND department_name LIKE '%" + name + "%'"
+    }
+
+    function getDepartmentData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_DEPARTMENT_INFO,
+            condition:getSearchCondition()
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function createDepartmentTable(containerID, data) {
+        if(data.length>0){
+            data[0]=["科室号","科室名","地址","电话"]
+        }
+
+        var container = document.getElementById(containerID);
+        var table = document.createElement("table");
+
+        // 创建表头
+        var thead = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+
+        var columnHeader = data[0].concat(["操作"]); // 创建新的表头数组
+
+        columnHeader.forEach(function (cellData) {
+            var th = document.createElement("th");
+            th.textContent = cellData;
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // 创建表格主体部分
+        var tbody = document.createElement("tbody");
+
+        for (var i = 1; i < data.length; i++) {
+            var row = document.createElement("tr");
+
+            var rowData = data[i].concat([""]); // 创建新的行数据数组
+
+            rowData.forEach(function (cellData, index) {
+                var td = document.createElement("td");
+                td.textContent = cellData;
+
+                // 如果是最后一列，添加操作按钮
+                if (index === rowData.length - 1) {
+                    var edit_button = document.createElement("button");
+                    edit_button.textContent = "编辑";
+                    edit_button.style.borderRadius = "5px 0px 0px 5px"
+                    edit_button.onclick = function (){
+                        openEdit(containerID, this)
+                    }
+                    var del_button = document.createElement("button");
+                    del_button.textContent = "删除";
+                    del_button.onclick = function () {
+                        deleteRow(containerID, this)
+                    }
+                    del_button.style.borderRadius = "0px 5px 5px 0px"
+                    var button_div = document.createElement("div");
+                    button_div.appendChild(edit_button)
+                    button_div.appendChild(del_button)
+                    td.appendChild(button_div);
+                }
+
+                row.appendChild(td);
+            });
+            tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+
+        // 将表格添加到容器中
+        container.appendChild(table);
+    }
+    function showMask() {
+        document.getElementById("mask").style.display = 'block'
+    }
+
+    function closeMask() {
+        document.getElementById("mask").style.display = 'none'
+
+    }
+
+
+
+    window.onload=showResult
+</script>
+<script src="../javascript/table.js"></script>
+<script src="../javascript/param.js"></script>
+</html>

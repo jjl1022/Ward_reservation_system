@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>入住管理</title>
+    <link rel="stylesheet" href="../css/table.css">
+    <style>
+        .pageTitle{
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+            font-size: 42px;
+        }
+        .bunk-search{
+            position: absolute;
+            top: 100px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+        }
+        .bookingTableContainer{
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+        }
+        .add-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .edit-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 调整颜色和透明度 */
+            z-index: 9998; /* 将覆盖层置于其他内容之上 */
+        }
+        input{
+            background: rgba(204, 204, 204, 0.18);
+            border: 2px solid #D3D3D3;
+            font-size: 24px;
+            border-radius: 5px;
+            text-indent: 10px;
+            outline: none;
+        }
+        input:focus {
+            border: 2px solid #3c8ed7;
+            background: rgba(255,255,255,1);
+        }
+
+    </style>
+</head>
+<body>
+<div class="pageTitle">住院管理</div>
+<div id="bunk-search" class="bunk-search">
+    <label for="booking_number-input">预定号</label><input id="booking_number-input" style="width: 200px" type="text" />
+    <label for="patient_ID-input">病人号</label><input id="patient_ID-input" style="width: 200px" type="text" />
+    <label for="bunk_number-input">床位号</label><input id="bunk_number-input" style="width: 200px" type="text" />
+    <label for="is_check_in-input">入住否</label><input id="is_check_in-input" style="width: 200px" type="text" />
+<!--    new Column("booking_number", "VARCHAR(10)"),//预定编号-->
+<!--    new Column("patient_ID", "VARCHAR(10)"),//病人号-->
+<!--    new Column("bunk_number", "VARCHAR(4)"),//床位号-->
+<!--    new Column("is_check_in", "VARCHAR(2)")//入住否-->
+    <button onclick="showResult()">检索</button><button onclick="openAdd()">增加</button>
+</div>
+<div id="bookingTableContainer" class="bookingTableContainer"></div>
+<div class="overlay" id="mask"></div>
+<div id="add-box" class="add-box">
+    <br><br><br><label style="font-size: 36px;">增加住院信息</label>
+    <div>
+        <label for="patient_ID-add-input">病人号</label><select id="patient_ID-add-input" type="text"></select>
+        <br><label for="bunk_number-add-select">床位号</label><select id="bunk_number-add-select" type="text"></select>
+        <br><label for="is_check_in-add-select">入住否</label><select id="is_check_in-add-select" type="text"></select>
+        <br><button onclick="addBooking()">添加</button>&emsp;<button onclick="closeAdd()">取消</button>
+    </div>
+</div>
+<div id="edit-box" class="edit-box">
+    <br><br><br><label style="font-size: 36px;">修改住院信息</label>
+    <div>
+        <label for="booking_number-edit-input">预定号</label><input disabled id="booking_number-edit-input" type="text" />
+        <br><label for="patient_ID-edit-input">病人号</label><input disabled id="patient_ID-edit-input" type="text" />
+        <br><label for="bunk_number-edit-select">床位号</label><select id="bunk_number-edit-select" type="text"></select>
+        <br><label for="is_check_in-edit-select">入住否</label><select id="is_check_in-edit-select" type="text"></select>
+        <br><button onclick="editBooking()">保存</button>&emsp;<button onclick="closeEdit()">取消</button>
+    </div>
+</div>
+</body>
+<script>
+    function openAdd(){
+        showMask()
+        clearSelectElement("patient_ID-add-input")
+        clearSelectElement("bunk_number-add-select")
+        clearSelectElement("is_check_in-add-select")
+        var patientOption=getAllPatientData()
+        var patient_ID_select = document.getElementById("patient_ID-add-input");
+        for (var i = 0; i < patientOption.length; i++) {
+            var option = document.createElement("option");
+            option.value = patientOption[i];
+            option.text = patientOption[i];
+            patient_ID_select.appendChild(option);
+        }
+
+        var bunkOption=getFreeBunk()
+        var bunk_number_select = document.getElementById("bunk_number-add-select");
+        for (var i = 0; i < bunkOption.length; i++) {
+            var option = document.createElement("option");
+            option.value = bunkOption[i];
+            option.text = bunkOption[i];
+            bunk_number_select.appendChild(option);
+        }
+
+        var checkIn_select = document.getElementById("is_check_in-add-select");
+        var yesOption = document.createElement("option");
+        yesOption.value = "是";
+        yesOption.text = "是";
+        checkIn_select.appendChild(yesOption);
+        var noOption = document.createElement("option");
+        noOption.value = "否";
+        noOption.text = "否";
+        checkIn_select.appendChild(noOption);
+
+        document.getElementById("add-box").style.display="block";
+    }
+    function addBooking(){
+        var patient_ID_select = document.getElementById("patient_ID-add-input")
+        var patient_ID=patient_ID_select.options[patient_ID_select.selectedIndex].value.split("##")[0]
+        var bunk_number_select = document.getElementById("bunk_number-add-select")
+        var bunk_number=bunk_number_select.options[bunk_number_select.selectedIndex].value
+        var checkIn_select = document.getElementById("is_check_in-add-select")
+        var checkIn=checkIn_select.options[checkIn_select.selectedIndex].value
+        var newRow=patient_ID+"#&"+bunk_number+"#&"+checkIn
+        var operateData={
+            new:newRow
+        }
+
+        syncDataToServer(WARD_BOOKING_TABLE,ADD_DATA,operateData)
+        closeAdd()
+        showResult()
+    }
+    function closeAdd(){
+        closeMask()
+        document.getElementById("add-box").style.display="none";
+    }
+    function openEdit(containerID, button){
+        showMask()
+        clearSelectElement("bunk_number-edit-select")
+        clearSelectElement("is_check_in-edit-select")
+        lastRow = getRow(containerID, parseInt(getRowIndex(button)))
+        document.getElementById("booking_number-edit-input").value=lastRow[0]
+        document.getElementById("patient_ID-edit-input").value=lastRow[1]
+        var thisBunk=lastRow[2]
+        var bunkOptions=getFreeBunk()
+        bunkOptions.push(thisBunk)
+        var bunkDropdown = document.getElementById("bunk_number-edit-select");
+
+        for (i = 0; i < bunkOptions.length; i++) {
+            var option = document.createElement("option");
+            option.value = bunkOptions[i];
+            option.text = bunkOptions[i];
+            bunkDropdown.appendChild(option);
+            if(bunkOptions[i].indexOf(thisBunk)!==-1){
+                bunkDropdown.selectedIndex = i;
+            }
+        }
+        var thisCheckIn=lastRow[3]
+        var checkInDropdown = document.getElementById("is_check_in-edit-select");
+        var yesOption = document.createElement("option");
+        yesOption.value = "是";
+        yesOption.text = "是";
+        checkInDropdown.appendChild(yesOption);
+        var noOption = document.createElement("option");
+        noOption.value = "否";
+        noOption.text = "否";
+        checkInDropdown.appendChild(noOption);
+        if(thisCheckIn==="是"){
+            checkInDropdown.selectedIndex = 0;
+        }else{
+            checkInDropdown.selectedIndex = 1;
+        }
+        document.getElementById("edit-box").style.display="block"
+    }
+    function editBooking(){
+        var newRow=document.getElementById("booking_number-edit-input").value
+            +"#&"+document.getElementById("patient_ID-edit-input").value
+            +"#&"+document.getElementById("bunk_number-edit-select").value
+            +"#&"+document.getElementById("is_check_in-edit-select").value
+        var operateData={
+            new:newRow
+        }
+        syncDataToServer(WARD_BOOKING_TABLE,EDIT_DATA,operateData)
+        closeEdit()
+        showResult()
+    }
+    function closeEdit(){
+        closeMask()
+        document.getElementById("edit-box").style.display="none";
+    }
+
+    function deleteRow(containerID,button){
+        lastRow = getRow(containerID, parseInt(getRowIndex(button)))
+        var oldRow=""
+        for(var i=0;i<lastRow.length;++i){
+            oldRow+=lastRow[i]+"#&"
+        }
+        var operateData={
+            type:CANCEL_BOONING_WARD,
+            old:oldRow
+        }
+        var confirmation = confirm("您确定要删除这一行吗？");
+        if (confirmation) {
+            var result=syncDataToServer(WARD_BOOKING_TABLE,DEL_DATA,operateData)
+            if(result.state){
+                alert("删除成功")
+                showResult()
+            }else{
+                alert("删除失败:"+result.responseMsg)
+            }
+        }
+    }
+
+    function showResult(){
+        var div=document.getElementById("bookingTableContainer")
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+        createBookingTable("bookingTableContainer",getBookingData().responseMsg)
+    }
+    function getSearchCondition(){
+        var booking_number=document.getElementById("booking_number-input").value
+        var patient_ID=document.getElementById("patient_ID-input").value
+        var bunk_number=document.getElementById("bunk_number-input").value
+        var is_check_in=document.getElementById("is_check_in-input").value
+        return "booking_number LIKE '%" + booking_number + "%' " +
+            "AND patient_ID LIKE '%" + patient_ID + "%' " +
+            "AND bunk_number LIKE '%" + bunk_number + "%' "+
+            "AND is_check_in LIKE '%" + is_check_in + "%' "
+    }
+
+    function getFreeBunk(){
+        var tempList=getBunkData().responseMsg
+        var resultList=[]
+        for(var i=1;i<tempList.length;++i){
+            if(tempList[i][2]==="否"){
+                resultList.push(tempList[i][0])
+            }
+        }
+        return resultList
+    }
+
+    function getAnPatientData(id){
+        var tempList=getPatientData().responseMsg
+        for(var i=1;i<tempList.length;++i){
+            if(tempList[i][0]===id){
+                return tempList[i][0]+"##"+tempList[i][1]
+            }
+        }
+        return ""
+    }
+
+    function getAllPatientData(){
+        var tempList=getPatientData().responseMsg
+        var resultList=[]
+        for(var i=1;i<tempList.length;++i){
+            resultList.push(String(tempList[i][0]+"##"+tempList[i][1]))
+        }
+        return resultList
+    }
+
+    function getPatientData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_PATIENT_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function getBunkData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_BED_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function getBookingData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_BED_BOOKING_INFO,
+            condition:getSearchCondition()
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function createBookingTable(containerID, data) {
+        if(data.length>0){
+            data[0]=["预定号","病人号","床位号","入住否"]
+        }
+
+        var container = document.getElementById(containerID);
+        var table = document.createElement("table");
+
+        // 创建表头
+        var thead = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+
+        var columnHeader = data[0].concat(["操作"]); // 创建新的表头数组
+
+        columnHeader.forEach(function (cellData) {
+            var th = document.createElement("th");
+            th.textContent = cellData;
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // 创建表格主体部分
+        var tbody = document.createElement("tbody");
+
+        for (var i = 1; i < data.length; i++) {
+            var row = document.createElement("tr");
+
+            var rowData = data[i].concat([""]); // 创建新的行数据数组
+
+            rowData.forEach(function (cellData, index) {
+                var td = document.createElement("td");
+                td.textContent = cellData;
+
+                // 如果是最后一列，添加操作按钮
+                if (index === rowData.length - 1) {
+                    var edit_button = document.createElement("button");
+                    edit_button.textContent = "编辑";
+                    edit_button.style.borderRadius = "5px 0px 0px 5px"
+                    edit_button.onclick = function (){
+                        openEdit(containerID, this)
+                    }
+                    var del_button = document.createElement("button");
+                    del_button.textContent = "删除";
+                    del_button.onclick = function () {
+                        deleteRow(containerID, this)
+                    }
+                    del_button.style.borderRadius = "0px 5px 5px 0px"
+                    var button_div = document.createElement("div");
+                    button_div.appendChild(edit_button)
+                    button_div.appendChild(del_button)
+                    td.appendChild(button_div);
+                }
+
+                row.appendChild(td);
+            });
+            tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+
+        // 将表格添加到容器中
+        container.appendChild(table);
+    }
+    function showMask() {
+        document.getElementById("mask").style.display = 'block'
+    }
+
+    function closeMask() {
+        document.getElementById("mask").style.display = 'none'
+
+    }
+
+
+
+    window.onload=showResult
+</script>
+<script src="../javascript/table.js"></script>
+<script src="../javascript/param.js"></script>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧病房管理系统</title>
+    <link rel="stylesheet" href="css/initSystem.css">
+
+</head>
+<body>
+<div><!--包含整个页面-->
+    <div><!--包含全部组件-->
+        <div class="big_title">
+            <label style="font-size: 64px;font-style: oblique;">HWMIS病房管理系统</label>
+        </div>
+        <div class="init_div"><!--包含注册框-->
+            <br><div class="little_title">系统快速初始化</div>
+            <div class="set_param_div" id="set_param_block">
+                <br><label class="log_label">设置数据库参数</label><br><br>
+                <input type="text" style="height: 40px" placeholder="数据库名" id="db_name_input"><br><br>
+                <input type="text" style="height: 40px" placeholder="数据库用户名" id="db_username_input"><br><br>
+                <input type="password" style="height: 40px" placeholder="数据库密码" id="db_password_input"><br><br>
+                <button style="font-size: 21px; width: 160px;height: 40px;" onclick="useDefaultParam()">使用默认参数</button>&emsp;&emsp;&emsp;
+                <button style="font-size: 21px; width: 90px;height: 40px;" onclick="nextPanel()">下一步</button>
+            </div>
+            <div class="reg_div" id="reg_block">
+                <br><label class="log_label">设置超级管理员</label><br><br>
+                <input type="text" style="height: 40px" placeholder="用户名" id="admin_username_input"><br><br>
+                <input type="password" style="height: 40px" placeholder="口令" id="admin_password_input"><br><br>
+                <input type="password" style="height: 40px" placeholder="重复口令" id="repeat_password_input"><br><br>
+                <button style="font-size: 21px; width: 90px;height: 40px;" onclick="lastPanel()">上一步</button>&emsp;&emsp;&emsp;&emsp;&emsp;
+                <button style="font-size: 21px; width: 120px;height: 40px;" onclick="initSystem()">激活系统</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="overlay" id="mask"></div>
+<div class="loading_block" id="loading_block">
+    <div class="loading">
+        <br><label style="font-size: 36px;">LOADING</label>
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+</div>
+<div class="message_block" id="message_block">
+    <label class="message" id="message">message box</label><br>
+    <button class="confirm_button" onclick="closeMessageBox()">确定</button>
+</div>
+</body>
+<script src="javascript/initSystem.js"></script>
+<script src="javascript/param.js"></script>
+</html>

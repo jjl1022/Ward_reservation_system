@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>数据统计</title>
+    <style>
+        .ward_info{
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            top: 100px;
+            left: 100px;
+            text-align: center;
+            border: 1px solid #cccccc;
+            border-radius: 30px;
+        }
+        .doctor_info{
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            top: 100px;
+            left: 420px;
+            text-align: center;
+            border: 1px solid #cccccc;
+            border-radius: 30px;
+        }
+        .nurse_info{
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            top: 420px;
+            left: 100px;
+            text-align: center;
+            border: 1px solid #cccccc;
+            border-radius: 30px;
+        }
+        .checkIn_info{
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            top: 420px;
+            left: 420px;
+            text-align: center;
+            border: 1px solid #cccccc;
+            border-radius: 30px;
+        }
+    </style>
+</head>
+<body>
+<h1>数据统计</h1>
+<div class="ward_info">
+    床位占用<br>
+    <canvas id="ward_info_chart"></canvas>
+</div>
+<div class="doctor_info">
+    医生分布<br>
+    <canvas id="doctor_info_chart"></canvas>
+</div>
+<div class="nurse_info">
+    护士情况<br>
+    <canvas id="nurse_info_chart"></canvas>
+</div>
+<div class="checkIn_info">
+    入住情况<br>
+    <canvas id="checkIn_info_chart"></canvas>
+</div>
+<script>
+    function refreshChart(){
+        refreshWard()
+        refreshDoctor()
+        refreshNurse()
+        refreshCheckIn()
+    }
+
+    function refreshWard(){
+        let tempList=getBunkData().responseMsg
+        var using=0
+        var free=0
+        for(var i=1;i<tempList.length;++i){
+            if(tempList[i][2]==="是")using++
+            else free++
+        }
+
+        var data = [
+            { value: using, label: '占用:'+using },
+            { value: free, label: '空闲:'+free },
+        ];
+
+        var total = 0;
+        for (var i = 0; i < data.length; i++) {
+            total += data[i].value;
+        }
+        for (var i = 0; i < data.length; i++) {
+            data[i].percentage = Math.round(data[i].value / total * 100);
+        }
+
+        function randomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        var canvas = document.getElementById("ward_info_chart")
+
+        var ctx = canvas.getContext('2d');
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.map(function(item) { return item.label; }),
+                datasets: [{
+                    data: data.map(function(item) { return item.percentage; }),
+                    backgroundColor: data.map(function() { return randomColor(); })
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                var value = context.parsed;
+                                if (value) {
+                                    label += ': ' + value.toLocaleString() + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+    }
+    function refreshDoctor(){
+        var data = [
+            { value: 2, label: '耳鼻喉科:2' },
+            { value: 3, label: '口腔科:3' },
+            { value: 2, label: '肿瘤科:2' },
+            { value: 3, label: '儿科:3' },
+        ];
+
+        var total = 0;
+        for (var i = 0; i < data.length; i++) {
+            total += data[i].value;
+        }
+        for (var i = 0; i < data.length; i++) {
+            data[i].percentage = Math.round(data[i].value / total * 100);
+        }
+
+        function randomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        var canvas = document.getElementById("doctor_info_chart")
+
+        var ctx = canvas.getContext('2d');
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.map(function(item) { return item.label; }),
+                datasets: [{
+                    data: data.map(function(item) { return item.percentage; }),
+                    backgroundColor: data.map(function() { return randomColor(); })
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                var value = context.parsed;
+                                if (value) {
+                                    label += ': ' + value.toLocaleString() + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+    }
+    function refreshNurse(){
+        var data = [
+            { value: 2, label: '耳鼻喉科:2' },
+            { value: 3, label: '口腔科:3' },
+            { value: 4, label: '肿瘤科:4' },
+            { value: 5, label: '儿科:5' },
+        ];
+
+        var total = 0;
+        for (var i = 0; i < data.length; i++) {
+            total += data[i].value;
+        }
+        for (var i = 0; i < data.length; i++) {
+            data[i].percentage = Math.round(data[i].value / total * 100);
+        }
+
+        function randomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        var canvas = document.getElementById("nurse_info_chart")
+
+        var ctx = canvas.getContext('2d');
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.map(function(item) { return item.label; }),
+                datasets: [{
+                    data: data.map(function(item) { return item.percentage; }),
+                    backgroundColor: data.map(function() { return randomColor(); })
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                var value = context.parsed;
+                                if (value) {
+                                    label += ': ' + value.toLocaleString() + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    function refreshCheckIn(){
+        let tempList=getBookingData().responseMsg
+        var using=0
+        var free=0
+        for(var i=1;i<tempList.length;++i){
+            if(tempList[i][3]==="是")using++
+            else free++
+        }
+
+        var data = [
+            { value: using, label: '入住:'+using },
+            { value: free, label: '未入住:'+free },
+        ];
+
+        var total = 0;
+        for (var i = 0; i < data.length; i++) {
+            total += data[i].value;
+        }
+        for (var i = 0; i < data.length; i++) {
+            data[i].percentage = Math.round(data[i].value / total * 100);
+        }
+
+        function randomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        var canvas = document.getElementById("checkIn_info_chart")
+
+        var ctx = canvas.getContext('2d');
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.map(function(item) { return item.label; }),
+                datasets: [{
+                    data: data.map(function(item) { return item.percentage; }),
+                    backgroundColor: data.map(function() { return randomColor(); })
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                var value = context.parsed;
+                                if (value) {
+                                    label += ': ' + value.toLocaleString() + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function getBunkData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_BED_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function getDoctorData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_DOCTOR_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function getNurseData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_NURSE_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function getBookingData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_BED_BOOKING_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    window.onload=refreshChart
+</script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../javascript/table.js"></script>
+<script src="../javascript/param.js"></script>
+</html>

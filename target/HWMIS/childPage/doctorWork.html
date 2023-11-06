@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>医生值班表</title>
+    <link rel="stylesheet" href="../css/table.css">
+    <style>
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 调整颜色和透明度 */
+            z-index: 9998; /* 将覆盖层置于其他内容之上 */
+        }
+        .autoMake{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .add-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .edit-box{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 500px;
+            text-align: center;
+            transform: translate(-50%,-50%);
+            display: none;
+            z-index: 9999;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.8);
+        }
+        .loading-dots {
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 50px;
+            position: absolute;
+            display: flex;
+            justify-content: flex-start;
+            background: rgba(255,255,255,0);
+        }
+
+        .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px; /* 调整点之间的间距 */
+            animation: moveRight 2s infinite; /* 定义点的移动动画 */
+            animation-fill-mode: both; /* 设置动画开始和结束状态的样式 */
+        }
+
+        .dot:nth-child(1) {
+            background-color: rgba(0, 0, 0, 0.2); /* 初始透明度为 0.2 的颜色 */
+            animation-delay: 0s;
+        }
+
+        .dot:nth-child(2) {
+            background-color: rgba(0, 0, 0, 0.6); /* 初始透明度为 0.4 的颜色 */
+            animation-delay: -0.5s; /* 调整点之间的延迟时间 */
+        }
+
+        .dot:nth-child(3) {
+            background-color: rgba(0, 0, 0, 1); /* 初始透明度为 0.6 的颜色 */
+            animation-delay: -1s; /* 调整点之间的延迟时间 */
+        }
+
+        @keyframes moveRight {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0; /* 初始透明度为 0 */
+            }
+            50% {
+                transform: translateX(100%);
+                opacity: 1; /* 最终透明度为 1 */
+            }
+            100% {
+                transform: translateX(100%);
+                opacity: 0; /* 结束时透明度再次为 0 */
+            }
+        }
+
+        .loading_block{
+            display: none;
+            position: absolute;
+            width: 400px;
+            height: 240px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(3px);
+            border-radius: 30px;
+            z-index: 99998;
+        }
+
+        .loading{
+            background: rgba(255,255,255,0);
+            position: absolute;
+            width: 300px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <label for="department-select">选择科室</label><select id="department-select"></select>
+    <button onclick="look()">点击查询</button>&emsp;<button onclick="openAutoMake()">自动生成值班表</button><br>
+    <div id="workTableContainer" class="workTableContainer"></div>
+    <div id="workTableContainer2" class="workTableContainer2"></div>
+</div>
+<div class="overlay" id="mask"></div>
+<div class="loading_block" id="loading_block">
+    <div class="loading">
+        <br><label style="font-size: 36px;">LOADING</label>
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+</div>
+<div id="edit-box" class="edit-box">
+    <br><br><br><label style="font-size: 36px;">修改值班人员</label>
+    <div>
+        <br><label for="doctor_duty_id-input">值班编号</label><input disabled id="doctor_duty_id-input"/><br>
+        <br><label for="doctor_ID-select">医生</label><select id="doctor_ID-select"></select><br>
+        <br><label for="duty_time-input">值班时间</label><input disabled id="duty_time-input"/><br>
+        <br><label for="department_ID-input">科室</label><input disabled id="department_ID-input"/><br>
+        <br><label for="duty_type-input">值班类型</label><input disabled id="duty_type-input"/><br>
+        <br><button onclick="editWorkTable()">保存</button>&emsp;<button onclick="closeEdit()">取消</button>
+    </div>
+</div>
+<div id="autoMake" class="autoMake">
+    <br><br><br><label style="font-size: 36px;">自动制表（一周）</label>
+    <div>
+        <br><label for="startDateInput">起始日期</label><input id="startDateInput" placeholder="yyyy-mm-dd"/><br>
+        <br><button onclick="autoMake()">生成</button>&emsp;<button onclick="closeAutoMake()">取消</button>
+    </div>
+</div>
+</body>
+<script>
+    function openEdit(containerID, button){
+        showMask()
+        lastRow = getRow(containerID, parseInt(getRowIndex(button)))
+        document.getElementById("doctor_duty_id-input").value=lastRow[0]
+        clearSelectElement("doctor_ID-select")
+        var thisDoctor=lastRow[1]
+        var options=[]
+        var tempList=getDoctorData("department_ID='"+getThisDepartmentID()+"'").responseMsg
+        for(i = 0; i<tempList.length-1; ++i){
+            options.push(String(tempList[i+1][0]+"##"+tempList[i+1][2]))
+        }
+        var dropdown = document.getElementById("doctor_ID-select");
+        for (i = 0; i < options.length; i++) {
+            var option = document.createElement("option");
+            option.value = options[i];
+            option.text = options[i];
+            dropdown.appendChild(option);
+            if(options[i].indexOf(thisDoctor)!==-1){
+                dropdown.selectedIndex = i;
+            }
+        }
+        document.getElementById("duty_time-input").value=lastRow[2]
+        document.getElementById("department_ID-input").value=lastRow[3]
+        document.getElementById("duty_type-input").value=lastRow[4]
+        document.getElementById("edit-box").style.display="block"
+    }
+    function editWorkTable(){
+        var newRow=document.getElementById("doctor_duty_id-input").value
+            +"#&"+document.getElementById("doctor_ID-select").value.split("##")[0]
+            +"#&"+document.getElementById("duty_time-input").value
+            +"#&"+document.getElementById("department_ID-input").value
+            +"#&"+document.getElementById("duty_type-input").value
+        var operateData={
+            new:newRow
+        }
+        syncDataToServer(DOCTOR_DUTY_SCHEDULE_TABLE,EDIT_DATA,operateData)
+        closeEdit()
+        showResult()
+    }
+    function closeEdit(){
+        closeMask()
+        document.getElementById("edit-box").style.display="none";
+    }
+
+    function getThisDepartmentID(){
+        var department=document.getElementById("department-select").value
+        return department.split("##")[0]
+    }
+
+    function showResult(){
+        var div=document.getElementById("workTableContainer2")
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+        var department=document.getElementById("department-select").value
+        var departmentID=department.split("##")[0]
+        createDoctorWorkTableFull("workTableContainer2",getDoctorWorkData("department_ID='"+departmentID+"'").responseMsg)
+    }
+
+    function createDoctorWorkTableFull(containerID, data) {
+        if(data.length>0){
+            data[0]=["值班记录号","医生号","值班时间","科室","值班类型"]
+        }
+
+        var container = document.getElementById(containerID);
+        var table = document.createElement("table");
+
+        // 创建表头
+        var thead = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+
+        var columnHeader = data[0].concat(["操作"]); // 创建新的表头数组
+
+        columnHeader.forEach(function (cellData) {
+            var th = document.createElement("th");
+            th.textContent = cellData;
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // 创建表格主体部分
+        var tbody = document.createElement("tbody");
+
+        for (var i = 1; i < data.length; i++) {
+            var row = document.createElement("tr");
+
+            var rowData = data[i].concat([""]); // 创建新的行数据数组
+
+            rowData.forEach(function (cellData, index) {
+                var td = document.createElement("td");
+                td.textContent = cellData;
+
+                // 如果是最后一列，添加操作按钮
+                if (index === rowData.length - 1) {
+                    var edit_button = document.createElement("button");
+                    edit_button.textContent = "编辑";
+                    edit_button.style.borderRadius = "5px 0px 0px 5px"
+                    edit_button.onclick = function (){
+                        openEdit(containerID, this)
+                    }
+                    var button_div = document.createElement("div");
+                    button_div.appendChild(edit_button)
+                    td.appendChild(button_div);
+                }
+
+                row.appendChild(td);
+            });
+            tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+
+        // 将表格添加到容器中
+        container.appendChild(table);
+    }
+
+    function openAutoMake(){
+        showMask()
+        document.getElementById("startDateInput").value=""
+        document.getElementById("autoMake").style.display="block"
+    }
+
+    function autoMake(){
+        var startDate=document.getElementById("startDateInput").value
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            'type': DEVELOP_DOCTOR_DUTY_SCHEDULE,
+            'startDate':startDate
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    responseMsg=JSON.parse(xhr.responseText)
+                    if(responseMsg.state==="succ"){
+                        alert("创建成功")
+                    }else{
+                        alert("创建失败")
+                    }
+                    closeAutoMake()
+                } else {
+                    alert("网络连接失败")
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+    }
+
+    function closeAutoMake(){
+        closeMask()
+        document.getElementById("autoMake").style.display="none"
+    }
+
+
+    function makeDepartmentOption(){
+        var tempList=getDepartmentData().responseMsg
+        var options=[]
+        for(var i=1;i<tempList.length;++i){
+            options.push(tempList[i][0]+"##"+tempList[i][1])
+        }
+        clearSelectElement("department-select")
+        var dropdown = document.getElementById("department-select");
+        for (i = 0; i < options.length; i++) {
+            var option = document.createElement("option");
+            option.value = options[i];
+            option.text = options[i];
+            dropdown.appendChild(option);
+        }
+    }
+
+    function look(){
+        showLoading()
+        var department=document.getElementById("department-select").value
+        var departmentID=department.split("##")[0]
+        var departmentName=department.split("##")[1]
+        var tempList=getDoctorWorkData().responseMsg
+        var tempList2=[]
+        for(var i=1;i<tempList.length;++i){
+            if(tempList[i][3]===departmentID){
+                tempList2.push(tempList[i])
+            }
+        }
+        console.log(tempList2)
+
+        var minDate="9999-99-99 99:99:99";
+        for(var i=0;i<tempList2.length;++i){
+            if(getMinDate(tempList2[i][2],minDate)!==minDate){
+                minDate=tempList2[i][2]
+            }
+        }
+        var result=[]
+        for(var i=0;i<7;++i){
+            var tempDay=['day','night']
+            result.push(tempDay)
+        }
+        for(var i=0;i<tempList2.length;++i){
+            if(tempList2[i][4]==="day"){
+                result[getDayDistance(minDate,tempList2[i][2])][0]=String(tempList2[i][1]+(getDoctorData("doctor_ID='"+tempList2[i][1]+"'").responseMsg)[1][2])
+            }else{
+                result[getDayDistance(minDate,tempList2[i][2])][1]=String(tempList2[i][1]+(getDoctorData("doctor_ID='"+tempList2[i][1]+"'").responseMsg)[1][2])
+            }
+        }
+        console.log(result)
+        var show_result=[
+            ['值班类型','周一','周二','周三','周四','周五','周六','周日'],
+            ['日班','周一','周二','周三','周四','周五','周六','周日'],
+            ['夜班','周一','周二','周三','周四','周五','周六','周日']
+        ]
+        for(var i=0;i<7;++i){
+            show_result[1][i+1]=result[i][0]
+            show_result[2][i+1]=result[i][1]
+        }
+        console.log(show_result)
+        var div=document.getElementById("workTableContainer")
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+        createDoctorWorkTable("workTableContainer",show_result)
+        closeLoading()
+        showResult()
+    }
+
+    function createDoctorWorkTable(containerID, data) {
+        var container = document.getElementById(containerID);
+        var table = document.createElement("table");
+
+        // 创建表头
+        var thead = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+
+        var columnHeader = data[0]; // 创建新的表头数组
+
+        columnHeader.forEach(function (cellData) {
+            var th = document.createElement("th");
+            th.textContent = cellData;
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // 创建表格主体部分
+        var tbody = document.createElement("tbody");
+
+        for (var i = 1; i < data.length; i++) {
+            var row = document.createElement("tr");
+
+            var rowData = data[i].concat([""]); // 创建新的行数据数组
+
+            rowData.forEach(function (cellData, index) {
+                var td = document.createElement("td");
+                td.textContent = cellData;
+                row.appendChild(td);
+            });
+            tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+
+        // 将表格添加到容器中
+        container.appendChild(table);
+    }
+
+    function getDoctorData(condition){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            'type': GET_DOCTOR_INFO,
+            'condition':condition
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function getDate(originDate){
+        return (originDate.split(" ")[0]).split("-")
+    }
+
+    function getDayDistance(date1,date2){
+        if(getMinDate(date1,date2)===date1){
+            var temp=date1
+            date1=date2
+            date2=temp
+        }
+        var d1=date1.split(" ")[0].split("-")
+        for(var i=0;i<d1.length;++i){
+            d1[i]=parseInt(d1[i])
+        }
+        var d2=date2.split(" ")[0].split("-")
+        for(var i=0;i<d1.length;++i){
+            d2[i]=parseInt(d2[i])
+        }
+        if(d1[0]!==d2[0]){
+            //不同年
+            return d1[2]+31-d2[2]
+        }else{
+            //同年
+            if(d1[1]===d2[1]){
+                //同一个月份
+                return d1[2]-d2[2]
+            }else{
+                //不同月
+                switch(d2[1]) {
+                    case 1:
+                    case 3:
+                    case 5:
+                    case 7:
+                    case 8:
+                    case 10:
+                        return d1[2]+31-d2[2]
+                    case 4:
+                    case 6:
+                    case 9:
+                    case 11:
+                        return d1[2]+30-d2[2]
+                    case 2:
+                        if((d1[0]%100!==0 && d1[0]%4===0)||(d1[0]%100===0 && d1[0]%400===0)){
+                            //闰年
+                            return d1[2]+29-d2[2]
+                        }else{
+                            //平年
+                            return d1[2]+28-d2[2]
+                        }
+                }
+            }
+
+        }
+    }
+
+    function getMinDate(date1,date2){
+        var d1=date1.split(" ")[0].split("-")
+        var d2=date2.split(" ")[0].split("-")
+        if(d1[0]>d2[0]){
+            return date2
+        }else if(d1[0]<d2[0]){
+            return date1
+        }else{
+            if(d1[1]>d2[1]){
+                return date2
+            }else if(d1[1]<d2[1]){
+                return date1
+            }else{
+                if(d1[2]>=d2[2]){
+                    return date2
+                }else if(d1[2]<d2[2]){
+                    return date1
+                }
+            }
+        }
+    }
+
+    function getDoctorWorkData(condition=""){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            'type': GET_DOCTOR_DUTY_SCHEDULE,
+            'condition':condition
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function getDepartmentData(){
+        var state=false//记录回复结果
+        var responseMsg;
+        const xhr = new XMLHttpRequest();
+        const url = getPostRequestUrl();
+        const requestData = {
+            type: GET_DEPARTMENT_INFO,
+            condition:""
+        };
+        console.log(JSON.stringify(requestData))
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    state=true;
+                    responseMsg=JSON.parse(xhr.responseText)
+                } else {
+                    state=false;
+                }
+            }
+        };
+        xhr.send(JSON.stringify(requestData));
+
+        return {state,responseMsg}
+    }
+
+    function showMask() {
+        document.getElementById("mask").style.display = 'block'
+    }
+
+    function closeMask() {
+        document.getElementById("mask").style.display = 'none'
+
+    }
+
+    function showLoading() {
+        showMask()
+        document.getElementById("loading_block").style.display = 'block'
+    }
+
+    function closeLoading() {
+        closeMask()
+        document.getElementById("loading_block").style.display = 'none'
+    }
+
+
+    window.onload=makeDepartmentOption
+</script>
+<script src="../javascript/param.js"></script>
+<script src="../javascript/table.js"></script>
+</html>
