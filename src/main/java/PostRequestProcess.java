@@ -16,137 +16,160 @@ import java.util.*;
 public class PostRequestProcess {
     protected static JSONObject requestJson;
 
-    // 状态：系统已经初始化过了
+    /**
+     * 状态：系统已经初始化过了
+     * **/
     public static final String STSYEM_HAS_INIT="SystemHasInit";
 
-    //状态：系统还未初始化
+    /**状态：系统还未初始化**/
     public static final String STSYEM_NOT_INIT="SystemNotInit";
 
-    // 检查系统是否初始化
+    /** 检查系统是否初始化**/
     public static final String CHECK_SYSTEM_STATE = "CheckSystemState";
 
-    // 系统初始化
+    /** 系统初始化 **/
     public static final String SYSTEM_INIT = "SystemInit";
 
-    // 登录请求
+    /** 登录请求**/
     public static final String LOG_IN = "LogIn";
 
-    // 增加管理员
+    /** 增加管理员 **/
     public static final String ADD_ADMIN = "AddAdmin";
 
-    // 修改管理员
+    /** 修改管理员 **/
     public static final String EDIT_ADMIN = "EditAdmin";
 
-    // 删除管理员
+    /** 删除管理员**/
     public static final String DEL_ADMIN = "DelAdmin";
 
-    // 增加病患
+    /**增加病患**/
     public static final String ADD_PATIENT = "AddPatient";
 
-    // 修改病患
+    /** 修改病患 **/
     public static final String EDIT_PATIENT = "EditPatient";
 
-    // 删除病患
+    /** 删除病患 **/
     public static final String DEL_PATIENT = "DelPatient";
 
-    // 增加病房
+    /** 增加病房**/
     public static final String ADD_WARD = "AddWard";
 
-    // 修改病房
+    /** 修改病房**/
     public static final String EDIT_WARD = "EditWard";
 
-    // 删除病房
+    /** 删除病房**/
     public static final String DEL_WARD = "DelWard";
 
-    // 增加床位
+    /** 增加床位 **/
     public static final String ADD_BED = "AddBed";
 
-    // 修改床位
+    /** 修改床位**/
     public static final String EDIT_BED = "EditBed";
 
-    // 删除床位
+    /** 删除床位 **/
     public static final String DEL_BED = "DelBed";
 
-    // 增加病例
+    /** 增加病例 **/
     public static final String ADD_CASE = "AddCase";
 
-    // 修改病例
+    /** 修改病例 **/
     public static final String EDIT_CASE = "EditCase";
 
-    // 删除病例
+    /** 删除病例 **/
     public static final String DEL_CASE = "DelCase";
 
-    // 调换病房
+    /** 调换病房 **/
     public static final String CHANGE_BED = "ChangeBed";
 
-    // 预定病房
+    /** 预定病房
+     *
+     */
     public static final String BOOKING_BED = "BookingBed";
 
-    // 增加医生
+    /** 增加医生
+     */
     public static final String ADD_DOCTOR = "AddDoctor";
 
-    // 修改医生
+    /** 修改医生
+     *
+     */
     public static final String EDIT_DOCTOR = "EditDoctor";
 
-    // 删除医生
+    /** 删除医生
+     *
+     */
     public static final String DEL_DOCTOR = "DelDoctor";
 
-    // 增加护士
+    /** 增加护士
+     *
+     */
     public static final String ADD_NURSE = "AddNurse";
 
-    // 修改护士
+    /** 修改护士
+     *
+     */
     public static final String EDIT_NURSE = "EditNurse";
 
-    // 删除护士
+    /** 删除护士
+     *
+     */
     public static final String DEL_NURSE = "DelNurse";
 
-    // 制定医生值班表
+    /** 制定医生值班表
+     *
+     */
     public static final String DEVELOP_DOCTOR_DUTY_SCHEDULE = "DevelopDoctorDutySchedule";
 
+    /** 编辑医生值班表
+     *
+     */
     public static final String EDIT_DOCTOR_DUTY_SCHEDULE = "EditDoctorDutySchedule";
-
+    /** 删除医生值班表
+     *
+     */
     public static final String DEL_DOCTOR_DUTY_SCHEDULE = "DelDoctorDutySchedule";
 
-    // 获取医生值班表
+    /** 获取医生值班表**/
     public static final String GET_DOCTOR_DUTY_SCHEDULE = "GetDoctorDutySchedule";
 
-    // 制定护士值班表
+    /** 制定护士值班表**/
     public static final String DEVELOP_NURSE_DUTY_SCHEDULE = "DevelopNurseDutySchedule";
-
+    /**编辑护士值班表**/
     public static final String EDIT_NURSE_DUTY_SCHEDULE = "EditNurseDutySchedule";
-
+    /**删除护士值班表**/
     public static final String DEL_NURSE_DUTY_SCHEDULE = "DelNurseDutySchedule";
 
-    // 获取护士值班表
+    /** 获取护士值班表**/
     public static final String GET_NURSE_DUTY_SCHEDULE = "GetNurseDutySchedule";
 
-    // 获取病患信息
+    /** 获取病患信息**/
     public static final String GET_PATIENT_INFO = "GetPatientInfo";
 
-    // 获取病房信息
+    /** 获取病房信息**/
     public static final String GET_WARD_INFO = "GetWardInfo";
 
-    // 获取医生信息
+    /** 获取医生信息**/
     public static final String GET_DOCTOR_INFO = "GetDoctorInfo";
 
-    // 获取护士信息
+    /** 获取护士信息 **/
     public static final String GET_NURSE_INFO = "GetNurseInfo";
 
+    /**获得床位信息**/
     public static final String GET_BED_INFO = "GetBedInfo";
 
-    // 获取病房预定信息
+    /** 获取病房预定信息 **/
     public static final String GET_BED_BOOKING_INFO = "GetWardBookingInfo";
 
-
+    /**获取管理信息**/
     public static final String GET_ADMIN_INFO="GetAdminInfo";
 
-    //病例
+    /**病例**/
     public static final String GET_CASES_INFO="GetCaseInfo";
 
-    //取消预约
+    /**取消预约**/
     public static final String CANCEL_BOONING_WARD = "CancelBookingWard";
 
-    //入住情况
+    /**入住情况**/
     public static final String ADD_CHECK_IN="AddCheckIn";
 
     public static final String EDIT_CHECK_IN="EditCheckIn";

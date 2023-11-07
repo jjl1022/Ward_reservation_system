@@ -1,7 +1,7 @@
-启动命令：docker run --name opengauss --privileged=true -d -e GS_USERNAME=dboper  -e GS_PASSWORD=@2003Tan -e GS_PORT=26000 -p 26000:26000 enmotech/opengauss:3.0.0
+启动命令：docker run --name opengauss --privileged=true -d -e GS_USERNAME=dboper  -e GS_PASSWORD=Xyz@1234 -e GS_PORT=26000 -p 26000:26000 enmotech/opengauss:3.0.0
 
-主机：120.46.87.179
+主机：8.130.40.31
 端口号：26000
 数据库：postgres
 用户名：dboper
-密码：@2003Tan
+密码：Xyz@1234
