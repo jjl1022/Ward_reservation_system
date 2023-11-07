@@ -201,7 +201,10 @@ public class PostRequestProcess {
     public static final String SELF_SEARCH_BOOKING = "SelfSearchBooking";
 
 
-
+   /**
+    * 用于从通过HttpServletRequest对象发送的HTTP POST请求中提取并处理JSON请求中的"type"属性
+    * 从JSONObject中提取并返回"type"属性的值
+    * **/
     protected static String getPostType(HttpServletRequest request) throws IOException {
         // 获取请求的输入流
         InputStream requestBody = request.getInputStream();
@@ -221,6 +224,7 @@ public class PostRequestProcess {
         return requestJson.getString("type");
     }
 
+    /**用于检查系统的状态，是否初始化**/
     protected static void checkSystemState(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //TODO:
         String filePath = Server.CONFIG_FILE_PATH; // 配置文件的路径
@@ -231,7 +235,7 @@ public class PostRequestProcess {
             response.getWriter().write(STSYEM_NOT_INIT);
         }
     }
-
+    /**用于初始化系统**/
     protected static void systemInit(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //TODO:成功就发送  init succ
         String IP="8.130.40.31";
@@ -282,7 +286,9 @@ public class PostRequestProcess {
         String plaintext="";
         return plaintext;
     }
-
+    /**
+     * 账号密码登录认证
+     * **/
     protected static boolean identityAuthentication(String username,String password){
         //TODO:身份认证
         ITable table = SystemRelationshipModel.getTable(ISystemRelationshipModel.ADMIN_INFO_TABLE);
