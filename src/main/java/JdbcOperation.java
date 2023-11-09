@@ -11,6 +11,9 @@ public class JdbcOperation {
 
     public static String JDBC_DRIVER_NAME = "org.postgresql.Driver";
 
+    /**
+     * 初始化数据库连接参数，包括数据库的 IP 地址、端口、数据库名、用户名和密码。这个方法会加载指定的 JDBC 驱动
+     * **/
     public static void initJdbcParams(String IP, int PORT, String dateBaseName, String _username, String _password) throws ClassNotFoundException {
         Class.forName(JDBC_DRIVER_NAME);
         //Logger.getLogger("org.postgresql").setLevel(java.util.logging.Level.WARNING);
@@ -19,7 +22,10 @@ public class JdbcOperation {
         username = _username;
         password = _password;
     }
-
+    /**
+     * 执行查询数据库表中的数据。它接受表名、列名列表、以及可选的查询条件作为参数，
+     * 并返回一个二维 ArrayList，其中包含查询结果的行和列数据
+     * **/
     public static ArrayList<ArrayList<String>> selectData(String tableName, ArrayList<String> nameList, String condition) {
         // 构建查询语句
         String selectQuery = "SELECT ";
@@ -50,6 +56,9 @@ public class JdbcOperation {
         return new ArrayList<>();
     }
 
+    /**
+     * 执行从数据库表中删除数据的操作。它接受表名和删除条件作为参数，并返回一个布尔值，表示是否成功删除数据
+     * **/
     public static boolean deleteData(String tableName, String condition) {
         String deleteQuery = "DELETE FROM " + tableName + " WHERE " + condition;
 
@@ -71,7 +80,10 @@ public class JdbcOperation {
             return false;
         }
     }
-
+    /**
+     * 执行更新数据库表中数据的操作。它接受表名、列名列表、新值列表以及更新条件作为参数，
+     * 然后返回一个布尔值，表示是否成功更新数据
+     * **/
     public static boolean updateData(String tableName, ArrayList<String> nameList, ArrayList<String> valueList, String condition) {
         if (nameList.size() != valueList.size()) return false;
         String updateQuery = "UPDATE " + tableName + " SET ";
@@ -97,7 +109,9 @@ public class JdbcOperation {
     public static boolean insertData(String tableName, ArrayList<String> valueList) {
         return insertData(tableName, new ArrayList<>(), valueList);
     }
-
+    /**执行向数据库表中插入数据的操作。它有两个重载版本，一个接受表名和值列表，
+     * 另一个接受表名、列名列表和值列表。这两个方法返回一个布尔值，表示是否成功插入数据
+     * **/
     public static boolean insertData(String tableName, ArrayList<String> nameList, ArrayList<String> valueList) {
         if ((nameList.size() != valueList.size()) && nameList.size() != 0) return false;
         String insertSQL;
@@ -134,6 +148,9 @@ public class JdbcOperation {
             return false;
         }
     }
+    /**执行创建数据库表的操作。它接受表名、列信息列表和可选的其他表定义信息作为参数，
+     * 并返回一个布尔值，表示是否成功创建表
+     * **/
 
     public static boolean createTable(String tableName, ArrayList<Column> columnList,String addition) {
         String createTableSql = "CREATE TABLE IF NOT EXISTS " + tableName + " (";
