@@ -46,10 +46,8 @@ function getLoginStatus() {
 }
 
 window.onload = function () {
-    var logStatus=getLoginStatus()
-    if(!logStatus.loggedIn){
-        window.location.href="login.html"
-    }
+        window.location.href="patientBookingBunk.html"
+
 }
 
 function setLogStatus(state) {

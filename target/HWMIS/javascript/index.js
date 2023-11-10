@@ -70,12 +70,9 @@ function showDataStat() {
     document.getElementById("admin_center_block").style.display="none"
 }
 
-function adminCenter(){
-    if(getLoginStatus().loggedIn){
-        window.location.href="admin.html"
-    }else{
-        window.location.href="login.html"
-    }
+function patientCenter(){
+        window.location.href="patientBookingBunk.html"
+
 }
 
 function openTab(evt, tabName) {
@@ -148,7 +145,7 @@ function checkSystemState() {
 
 window.onload=function(){
     checkSystemState()
-    window.location.href="login.html"
+    window.location.href="patientBookingBunk.html"
 }
 
 
