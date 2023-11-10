@@ -5,6 +5,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * 这段代码是用于护士的值班表数据并且把这些数据存储到数据库里面
+ * **/
 public class NurseDutyScheduler {
     private Connection connection;
 

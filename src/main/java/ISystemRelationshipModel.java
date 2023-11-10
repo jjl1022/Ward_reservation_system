@@ -1,3 +1,6 @@
+/**
+ * 基本的表单信息都在这里
+ * **/
 public interface ISystemRelationshipModel {
     String ADMIN_INFO_TABLE = "admin_info_table";//管理员信息表
 
